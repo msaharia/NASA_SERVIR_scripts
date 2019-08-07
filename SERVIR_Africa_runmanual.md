@@ -36,7 +36,7 @@ This manual will outline the steps need to be performed to do the monthly run.
 The Land Surface Model and Routing model output files from Step 2.1 have to be merged and prepared for the Tethys Viewer
 
 * Go to `netcdf_conversion`
-* `./convertlisnetcdf 2019 5 20 2019 5 22 ./retrospective_directory /home/Socrates/hjung/tethyswa_lis_viewer/retrospective/ ./servirwa_nc_clsmf25_output.tbl.list.cf` 
+* This will convert the data from start time (2019 5 20) to end time (2019 5 22): `./convertlisnetcdf 2019 5 20 2019 5 22 ./retrospective_directory /home/Socrates/hjung/tethyswa_lis_viewer/retrospective/ ./servirwa_nc_clsmf25_output.tbl.list.cf` 
 
 ## Forecast Run
 
