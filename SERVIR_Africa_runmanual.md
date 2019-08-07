@@ -40,7 +40,7 @@ The Land Surface Model and Routing model output files from Step 2.1 have to be m
 
 ## Forecast Run
 
-2.1 GEOS5 download
+3.1 GEOS5 download
 
 * 7 ensemble members
 * Only Forecast, no hindcast, p1-p4
@@ -58,8 +58,8 @@ The Land Surface Model and Routing model output files from Step 2.1 have to be m
     * Test with 2019, May 1
     * Download for Apr 26
 
-2.2 GEOS5 Downscaling and Bias Correction
+3.2 GEOS5 Downscaling and Bias Correction
 
-2.3 Forecast run
+3.3 Forecast run
 
 
