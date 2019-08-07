@@ -4,7 +4,7 @@ This manual will outline the steps need to be performed to do the monthly run.
 
 ## Retro run
  
-1.1 Download CHIRPS data
+### 1.1 Download CHIRPS data
 
 * Open this script: get_CHIRPS_monthly.sh
 * Change `chirpsdir` to your directory where you would like to store the data
@@ -15,7 +15,7 @@ This manual will outline the steps need to be performed to do the monthly run.
 * Download will commence
 
 
-1.2 Download MERRA2 data
+### 1.2 Download MERRA2 data
 
 * Open this script: Get_merra2_ges_disc_ALLVARS.sh
 * Change `WORKDIR` to your directory where you would like to store the data
@@ -25,9 +25,10 @@ This manual will outline the steps need to be performed to do the monthly run.
     * Month. Enter 4, for example
 * Download will commence for 4 MERRA2 variables
 
-1.3 retro LIS run
+## Retro run
+### 2.1 retro LIS run
 
-1.4 conversion of nETCDF for lis viewer
+### 2.2 conversion of nETCDF for lis viewer
 
 ## Forecast Run
 
