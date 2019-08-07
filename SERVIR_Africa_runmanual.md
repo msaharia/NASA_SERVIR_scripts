@@ -2,7 +2,7 @@
 
 This manual will outline the steps need to be performed to do the monthly run.
 
-## Retro run
+## Download data
  
 ### 1.1 Download CHIRPS data
 
@@ -25,10 +25,15 @@ This manual will outline the steps need to be performed to do the monthly run.
     * Month. Enter 4, for example
 * Download will commence for 4 MERRA2 variables
 
-## Retro run
-### 2.1 retro LIS run
+## Retrospective run
 
-### 2.2 conversion of nETCDF for lis viewer
+### 2.1 LIS retro run
+* Go to `/home/Socrates/hjung/WA_025/MODEL_RUN/OL_CLSM`
+* Run LIS `./LIS -f /home/Socrates/hjung/WA_025/MODEL_RUN/OL_CLSM/lis.config`
+
+### 2.2 Prepare LIS outputs for Tethys Viewer
+
+The Land Surface Model and Routing model output files from Step 2.1 have to be merged and prepared for the Tethys Viewer
 
 ## Forecast Run
 
