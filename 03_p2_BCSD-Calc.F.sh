@@ -58,55 +58,88 @@ cal_ic_dates() {
 
 
 cal_ic_dates $iMonth
-echo ${iMon[@]}
+echo ${iMon[@]} #Initialization month
 
 
 #  Forecast data specifications:
-   iMon=jun01              #Initialization Month to be changed as needed
-   iMonNo=6               #Initialization Month to be changed as needed
-#   iMon=feb01
-#   iMonNo=2
-   ens_numc=4
-   ens_numf=7 #10
-   lead_months=6
+iMonNo=$iMonth         #Initialization Month to be changed as needed
+ens_numc=4  #climatology
+ens_numf=7 #10
+lead_months=6
 
 #  Domain extents (from LL to UR):
 #  FAME DOMAIN ...
-   lat1=0    #-40
-   lat2=30   #40
-   lon1=-20  #-20
-   lon2=30   #60
-#
+lat1=0    #-40
+lat2=30   #40
+lon1=-20  #-20
+lon2=30   #60
+
 # Path of the directory where all the climatology and BCSD codes are kept:
-#
+SRCDIR='/gpfsm/dnb04/projects/p84/msaharia/autoservir/NASA_SERVIR_scripts/code_library' #Path to code_library
 
-   SRCDIR='/discover/nobackup/projects/servirwa/hahn/MODEL_RUNS/BCSD_Scripts_GEOS5V2_wa/code_library' #Path to code_library
-
-#   SRCDIR='/discover/nobackup/projects/fame/FORECASTS/GEOS5/BCSD_Test/FAME_Dec_V2/code_library'
-#
 # Path for where files are GEOS5, CHIRPS, etc. files are located:
-#    
+# FORCEDIR1='/gpfsm/dnb04/projects/p84/msaharia/autoservir/GEOS5'     #MY RAW GEOS5 DATA
+FORCEDIR1='/discover/nobackup/projects/fame/FORECASTS/GEOS5/'     #MY RAW GEOS5 DATA
+FORCEDIR='/gpfsm/dnb04/projects/p84/msaharia/autoservir/BCSD_Scripts_GEOS5V2_wa/SERVIRWA_May_data'      #PATH to CLIMATOLOGY DATA,MONTHLY BCSD DATA OUTPUT
 
-   FORCEDIR1='/discover/nobackup/projects/fame/FORECASTS/GEOS5/'     #PATH to RAW GEOS5 DATA
-   FORCEDIR='/discover/nobackup/projects/servirwa/hahn/MODEL_RUNS/BCSD_Scripts_GEOS5V2_wa/SERVIRWA_Jun_data/'      #PATH to CLIMATOLOGY DATA,MONTHLY BCSD DATA OUTPUT
-
-#   FORCEDIR1='/discover/nobackup/projects/fame/FORECASTS/GEOS5/' 
-#   FORCEDIR='/discover/nobackup/projects/fame/FORECASTS/GEOS5/BCSD_Test/FAME_Dec_data'
-#
 # Paths to the CLIMATOLOGY data to perform bias correction (STEP 4):
-#
-   CLIM_INDIR=${FORCEDIR}'/'${fcstdatatype} 
-   FCSTRAW_INDIR=${FORCEDIR1}'/RAW_GEOS5.V2'
+CLIM_INDIR=${FORCEDIR}'/'${fcstdatatype} 
+FCSTRAW_INDIR=${FORCEDIR1}'/RAW_GEOS5.V2'
 
-   OUTDIR3=${FORCEDIR}'/'${fcstdatatype}'/BCSD_DATA'
-   mkdir -p ${OUTDIR3}
-#
-   CHIRPS_MASK2=${SRCDIR}'/CHIRPS_0.25_MASK.nc'
-   CHIRPS_MASK3=${SRCDIR}'/CHIRPS_MASK.nc'
+OUTDIR3=${FORCEDIR}'/'${fcstdatatype}'/BCSD_DATA'
+mkdir -p ${OUTDIR3}
+
+CHIRPS_MASK2=${SRCDIR}'/CHIRPS_0.25_MASK.nc'
+CHIRPS_MASK3=${SRCDIR}'/CHIRPS_MASK.nc'
 
 #  Log file output directory
-
-   LOGDIR=${SRCDIR}'/Log_Files'
-   mkdir -p ${LOGDIR}
+LOGDIR=${SRCDIR}'/Log_Files'
+mkdir -p ${LOGDIR}
 #
 # Source and load required modules:
+# Source and load required modules:
+source /usr/share/modules/init/sh
+module load other/comp/gcc-5.3-sp3
+module load other/SSSO_Ana-PyD/SApd_4.2.0_py2.7_gcc-5.3-sp3
+module load other/cdo-1.7.1
+
+#
+#------------------------------------------------------------------------------
+#
+#   Perform bias corrections, using observed and forecast sorted
+#    climatologies, and target forecasts
+#
+#   Note that below script uses CHIRPS_0.25_MASK.nc and CHIRPS_MASK.nc as
+#   masks for PRECTOT and the other variables, respectively.
+#
+   echo " -- Processing forecast bias correction of GEOS5.0 variables -- "
+
+#  Calculate bias correction for different variables separately:
+   OBS_VAR_LIST=(PRECCON PRECTOT LWGAB SWGDN PS QV2M T2M U10M V10M)
+   FCST_VAR_LIST=(CNPRCP PRECTOT LWS SLRSF PS Q2M T2M U10M V10M)
+   UNIT=('kg/m^2/s' 'kg/m^2/s' 'W/m^2' 'W/m^2' 'Pa' 'kg/kg' 'K' 'm/s' 'm/s')
+
+
+   for VAR_NUM in 0 1 2 3 4 5 6 7 8; do
+      if [ $VAR_NUM == 0 ] || [ $VAR_NUM == 1 ] || [ $VAR_NUM == 3 ]; then
+        VAR_TYPE='PRCP'
+      else
+        VAR_TYPE='TEMP'
+      fi
+       echo ${VAR_NUM}" "${FCST_VAR_LIST[$VAR_NUM]}
+
+#     sbatch $SRCDIR/run_BCSD_calc1.scr ${SRCDIR} ${OBS_VAR_LIST[$VAR_NUM]} ${FCST_VAR_LIST[$VAR_NUM]} $iMonNo $VAR_TYPE ${UNIT[$VAR_NUM]} $lat1 $lat2 $lon1 $lon2 $ens_numc $ens_numf $fcstdatatype $lead_months $FCST_SYR $FCST_EYR $CLIM_SYR $CLIM_EYR $CHIRPS_MASK2 $CHIRPS_MASK3 $CLIM_INDIR $FCSTRAW_INDIR $OUTDIR3 $LOGDIR $fcstdatatype
+
+
+#   ulimit -s unlimited
+
+#   echo " Calculating BCSD Step for Variable :: "${VAR_TYPE}
+
+     python ${SRCDIR}/Bias_correction_module1.py ${OBS_VAR_LIST[$VAR_NUM]} ${FCST_VAR_LIST[$VAR_NUM]} ${VAR_TYPE} ${UNIT} ${lat1} ${lat2} ${lon1} ${lon2} ${iMonNo} ${fcstdatatype} ${lead_months} ${ens_numc} ${ens_numf} ${FCST_SYR} ${FCST_EYR} ${CLIM_SYR} ${CLIM_EYR} ${CLIM_INDIR} ${FCSTRAW_INDIR} ${CHIRPS_MASK2} ${CHIRPS_MASK3} ${OUTDIR3} > ${LOGDIR}/Calc_BCSD_${OBS_VAR_LIST}.log
+
+#   echo " -- BCSD Coarse grid calculation Complete -- "
+
+
+   done
+
+   echo " -- Completed processing BCSD forcing files for: "${iMon}" -- "
