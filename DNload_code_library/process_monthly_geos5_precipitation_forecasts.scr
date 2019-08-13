@@ -1,0 +1,79 @@
+#!/bin/bash
+# Download and process the monthly GEOS-5 forecasts from daily files:
+#
+SYR="${1}"
+EYR="${2}"
+FCST_INIT_MON="${3}"
+SRCDIR="${4}"
+OUTDIR="${5}"
+FORCEDIR="${6}" 
+#Example: /gpfsm/dnb78s2/projects/p25/run/1982/apr01/ens1/geosgcm_vis2d/apr01.geosgcm_vis2d.monthly.198212.nc4
+
+mkdir -p $OUTDIR;
+
+# Grid description array for MERRA2:
+GRID_DESCRIPTION=${SRCDIR}'/CHIRPS_0.25_degree_grid_description.txt'
+
+# Dates of the different ensembles of a given Initialization Month:
+
+ic1="${7}"
+ic2="${8}"
+ic3="${9}"
+#ic4="${10}"
+ic4="${7}" #HARDCODED TO BE THE LAST DATE
+
+# -----------------------------------
+# Loop over the GEOS5 forecast years:
+for ((YEAR=$SYR; YEAR<=$EYR; YEAR++)); do
+  ENS_NUM=1
+  YEARi="$(($YEAR-1))"
+  ENS2=7
+  mon=$ic4
+#  
+# This loop checks for January initialization month to change year -
+# for ensemble members in December
+#
+  if [ $FCST_INIT_MON == jan01 ]; then 
+   if [ $mon == $ic1 ]; then  
+     YEAR1=$YEARi
+   elif  [ $mon == $ic2 ]; then  
+     YEAR1=$YEARi
+   elif [ $mon == $ic3 ]; then  
+     YEAR1=$YEARi
+   elif [ $mon == $ic4 ]; then  
+     YEAR1=$YEARi
+   fi
+  else
+   YEAR1=$YEAR
+  fi
+  
+   declare -a enslist=("ens1" "ens6" "ens7" "ens8" "ens9" "ens10" "ens11")
+
+   enstotal=${#enslist[@]} #Total number of ensembles
+
+   # Loop over the ensembles with a counter
+   for (( i=1; i<${enstotal}+1; i++ )); do
+     sourceens="${enslist[$i-1]}"
+     destens="ens${i}"
+
+     echo "PROCESSING $sourceens $destens of $YEAR$mon"
+     
+     INDIR="$FORCEDIR"/"Y$YEAR1"/"$mon"/"$sourceens"/geosgcm_vis2d
+
+     for file in "$INDIR"/*.nc4; do
+       final_name=$(basename -- "$file")  
+       final_name=`echo "$final_name" | cut -d'.' -f2-`;
+       OUTPUT="$OUTDIR"/PRECTOT_Monthly/"$YEAR"/"$FCST_INIT_MON"/"$destens"/geosgcm_vis2d/;
+       mkdir -p $OUTPUT;
+       
+       #Process each file
+       cdo selvar,T2M,Q2M,SLRSF,LWS,U10M,V10M,PS,PRECTOT,CNPRCP $file "$OUTPUT"/junk_$final_name;
+       cdo remapbil,$GRID_DESCRIPTION "$OUTPUT"/junk_$final_name "$OUTPUT"/"$FCST_INIT_MON"."$final_name"
+       rm -rf "$OUTPUT"/junk_$final_name
+     done
+       
+   done
+  done;
+echo " -- Done downloading and processing GEOS-5 monthly files -- "
+
+exit 0

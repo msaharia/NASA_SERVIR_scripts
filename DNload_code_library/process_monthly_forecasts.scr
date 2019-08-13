@@ -1,0 +1,105 @@
+#!/bin/bash
+# Download and process the monthly GEOS-5 forecasts from daily files:
+#
+SYR="${1}"
+EYR="${2}"
+
+#FCST_INIT_MON
+FCST_INIT_MON="${3}"
+
+# MAKE SURE PATHS ARE RESET TO YOUR LOCAL DIRECTORY:
+# Source code and script directory:
+SRCDIR="${4}"
+# Output directory, where to write processed files to:
+OUTDIR="${5}"
+mkdir -p $OUTDIR;
+
+# Where the GEOS5 forecast datasets are located:
+FORCEDIR="${6}" 
+#Example: /gpfsm/dnb78s2/projects/p25/run/1982/apr01/ens1/geosgcm_vis2d/apr01.geosgcm_vis2d.monthly.198212.nc4
+
+#echo $SYR
+#echo $EYR
+#echo $FCST_INIT_MON
+#echo $SRCDIR
+#echo $OUTDIR
+#echo $FORCEDIR
+
+# Grid description array for MERRA2:
+GRID_DESCRIPTION=${SRCDIR}'/MERRA-2_grid_description.txt'
+
+# Dates of the different ensembles of a given Initialization Month:
+
+ic1="${7}"
+ic2="${8}"
+ic3="${9}"
+ic4="${10}"
+
+
+#echo $ic1
+#echo $ic2
+#echo $ic3
+#echo $ic4
+
+
+
+# -----------------------------------
+
+# Loop over the GEOS5 forecast years:
+for ((YEAR=$SYR; YEAR<=$EYR; YEAR++)); do
+  ENS_NUM=1
+  YEARi="$(($YEAR-1))"
+#  for mon in apr11 apr16 apr21 apr26 may01; do
+#  for mon in jun10 jun15 jun20 jun25 jun30; do
+  for mon in $ic1 $ic2 $ic3 $ic4; do
+#  if [ $mon == $FCST_INIT_MON ]; then
+   if [ $mon == $ic4 ]; then
+     ENS2=1
+   else
+     ENS2=1
+   fi
+#  
+# This loop checks for January initialization month to change year -
+# for ensemble members in December
+#
+   if [ $FCST_INIT_MON == jan01 ]; then 
+    if [ $mon == $ic1 ]; then  
+      YEAR1=$YEARi
+    elif [ $mon == $ic2 ]; then  
+      YEAR1=$YEARi
+    elif [ $mon == $ic3 ]; then  
+      YEAR1=$YEARi
+    elif [ $mon == $ic4 ]; then  
+      YEAR1=$YEARi
+    fi
+   else
+    YEAR1=$YEAR
+   fi
+#
+#
+   
+# Loop over the GEOS-5ensemble members:
+  for ((num=1; num<=$ENS2; num++)); do
+    ens=ens"$num"
+    INDIR="$FORCEDIR"/"$YEAR1"/"$mon"/"$ens"/geosgcm_vis2d
+    echo "INDIR: $INDIR"
+    for file in "$INDIR"/*.nc4; do
+     echo "FILENAME $file"
+     final_name=`echo "$file" | awk 'BEGIN{FS="/"}{print $16}' | awk 'BEGIN{FS="."}{print $2"."$3"."$4".nc4"}'`;
+     echo $final_name
+     mkdir -p "$OUTDIR"/Monthly
+     OUTPUT="$OUTDIR"/Monthly/"$YEAR"/"$FCST_INIT_MON"/ens"$ENS_NUM"/geosgcm_vis2d/;
+     mkdir -p $OUTPUT;
+     echo ENS number is $ENS_NUM""
+     cdo selvar,T2M,Q2M,SLRSF,LWS,U10M,V10M,PS,PRECTOT,CNPRCP $file "$OUTPUT"/junk_$final_name;
+     cdo remapbil,$GRID_DESCRIPTION "$OUTPUT"/junk_$final_name "$OUTPUT"/"$FCST_INIT_MON"."$final_name"
+     rm -rf "$OUTPUT"/junk_$final_name
+    done; ## end of all lead now move to fcst_mon
+   (( ENS_NUM += 1 ))
+  done; 
+  done;
+done
+
+ echo " -- Done downloading and processing GEOS-5 monthly files -- "
+
+

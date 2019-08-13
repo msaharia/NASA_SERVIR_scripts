@@ -1,0 +1,113 @@
+#!/bin/sh
+
+# Passing in user-specified arguments:
+SYR=${1}
+EYR=${2}
+FCST_INIT_MON=${3}
+
+SRCDIR=${4}
+OUTDIR=${5}
+OUTDIR1=${OUTDIR}/Daily
+OUTDIR2=${OUTDIR}/PRECTOT_Daily
+
+FORCEDIR=${6}
+GRID_DESCRIPTION=${7}
+GRID_DESCRIPTION2=${8}
+
+ic1="${9}"
+ic2="${10}"
+ic3="${11}"
+ic4="${9}"
+
+#echo $SYR", "$EYR", "$FCST_INIT_MON
+#echo $SRCDIR
+#echo $OUTDIR
+#echo $OUTDIR1
+#echo $OUTDIR2
+#echo $FORCEDIR
+#echo $GRID_DESCRIPTION
+#echo $GRID_DESCRIPTION2
+
+echo $ic1", "$ic2", "$ic3", "$ic4
+
+# ________________________________________
+
+# Loop over each year:
+for ((YEAR=$SYR; YEAR<=$EYR; YEAR++)); do
+ ENS_NUM=1
+ YEARi="$(($YEAR-1))"
+
+# Account for GEOS5 start dates as ensemble members (11-members):
+ ENS2=7
+ mon=$ic4
+# for mon in $ic1 $ic2 $ic3 $ic4 ; do
+#   if [ $mon == $ic4 ]; then
+#     ENS2=7
+#   else
+#     ENS2=1
+#   fi
+#  
+# This loop checks for initialization month to change year -
+#
+   if [ $FCST_INIT_MON == jan01 ]; then 
+    if [ $mon == $ic1 ]; then  
+      YEAR1=$YEARi
+    elif  [ $mon == $ic2 ]; then  
+      YEAR1=$YEARi
+    elif [ $mon == $ic3 ]; then  
+      YEAR1=$YEARi
+    elif [ $mon == $ic4 ]; then  
+      YEAR1=$YEARi
+    fi
+   else
+    YEAR1=$YEAR
+   fi
+
+# Loop over each ensemble member
+   declare -a enslist=("ens1" "ens6" "ens7" "ens8" "ens9" "ens10" "ens11")
+
+   enstotal=${#enslist[@]} #Total number of ensembles
+
+   # Loop over the ensembles with a counter
+   for (( i=1; i<${enstotal}+1; i++ )); do
+     sourceens="${enslist[$i-1]}"
+     destens="ens${i}"
+
+     echo "PROCESSING $sourceens $destens of $YEAR$mon"
+
+     INDIR="$FORCEDIR"/"Y$YEAR1"/"$mon"/"$sourceens"/geosgcm_vis2d
+
+     for file in "$INDIR"/*.nc4.tar; do
+        # First unarchive *.tar file
+        OUTPUT1=$OUTDIR1"/"$YEAR"/"$FCST_INIT_MON"/"$destens"/geosgcm_vis2d/"        
+        OUTPUT2=$OUTDIR2"/"$YEAR"/"$FCST_INIT_MON"/"$destens"/geosgcm_vis2d/"
+ 
+        TEMPARCHIVE=$OUTDIR"/unarchive"
+        mkdir -p $OUTPUT1 $OUTPUT2 $TEMPARCHIVE
+        tar -C $TEMPARCHIVE -xvf $file
+
+        # Loop over each daily file:
+        for daily_file in $TEMPARCHIVE/*.nc4; do
+            final_name=$(basename -- "$file")
+            final_name=`echo "$final_name" | cut -d'.' -f2-`;
+            echo $final_name
+
+          # Subset fields and remap to destination grid:
+            cdo selvar,T2M,Q2M,SLRSF,LWS,U10M,V10M,PS,CNPRCP ${daily_file} ${OUTPUT1}/junk_${final_name};
+            cdo remapbil,${GRID_DESCRIPTION} ${OUTPUT1}/junk_${final_name} ${OUTPUT1}/junk_2${final_name}
+            nccopy -d1 -s ${OUTPUT1}"/junk_2"${final_name} ${OUTPUT1}"/"${FCST_INIT_MON}"."${final_name}
+            rm -rf ${OUTPUT1}/junk*${final_name}
+
+          # Now processing precipitation forecast files:
+            cdo selvar,PRECTOT ${daily_file} ${OUTPUT2}/junk_${final_name};
+            cdo remapbil,${GRID_DESCRIPTION2} ${OUTPUT2}/junk_${final_name} ${OUTPUT2}/junk_2${final_name}
+            nccopy -d1 -s ${OUTPUT2}"/junk_2"${final_name} ${OUTPUT2}"/"${FCST_INIT_MON}"."${final_name}
+            rm -rf ${OUTPUT2}/junk*${final_name}  
+        done
+            rm -rf $TEMPARCHIVE
+     done
+   done
+done;
+
+echo " -- Done downloading daily GEOS5 files -- "
+
