@@ -1,0 +1,88 @@
+#!/bin/sh
+#SBATCH --job-name=Temporal_disagg
+#
+## Jobs are submitted via the QoS now:
+##SBATCH --time=11:55:00
+#SBATCH --ntasks=1 --constraint=hasw
+#SBATCH --qos=long
+#SBATCH --time=23:55:00
+#
+## Enter NCCS Project ID below:
+#SBATCH --account=s1777
+#
+## Enter user email below:
+#SBATCH --mail-user=hahnchul.jung@nasa.gov
+#SBATCH --mail-type=END
+#SBATCH --output=PART3_Temporal_disagg-%j.out
+#SBATCH --error=PART3_Temporal_disagg-%j.err
+
+## Switch to local working directory and request unlimited stacksize memory:
+
+SRCDIR=${1}
+OBS_VAR_LIST=${2}
+FCST_VAR_LIST=${3}
+iMonNo=${4}
+VAR_TYPE=${5}
+UNITS=${6}
+lat1=${7} 
+lat2=${8}
+lon1=${9}
+lon2=${10}
+fcstdatatype=${11}
+ens_num=${12}
+lead_months=${13} 
+FCST_SYR=${14} 
+FCST_EYR=${15} 
+MASK_FILE1=${16} 
+MASK_FILE2=${17} 
+INDIR2=${18} 
+DAILY_RAW_FCST_DIR=${19}
+OUTDIR2=${20}
+INDIR21=${21} 
+MASK_FILE3=${22}
+LOGDIR=${23}
+
+echo $SRCDIR
+echo $OBS_VAR_LIST
+echo $FCST_VAR_LIST
+echo $iMonNo
+echo $VAR_TYPE
+echo $UNITS
+echo $lat1 
+echo $lat2
+echo $lon1
+echo $lon2
+echo $ens_num
+echo $lead_months
+echo $FCST_SYR
+echo $FCST_EYR
+echo $MASK_FILE1 
+echo $MASK_FILE2
+echo $INDIR2
+echo $DAILY_RAW_FCST_DIR
+echo $OUTDIR2
+echo $INDIR21
+echo $MASK_FILE3
+echo $LOGDIR
+
+cd $SRCDIR
+ulimit -s unlimited
+
+source /usr/share/modules/init/sh
+module load other/comp/gcc-5.3-sp3
+module load other/SSSO_Ana-PyD/SApd_4.2.0_py2.7_gcc-5.3-sp3
+module load other/cdo-1.7.1
+
+
+for ((YEAR=$FCST_SYR; YEAR<=$FCST_EYR; YEAR++)); do 
+  echo "Doing daily temporal downscaling"; 
+  python $SRCDIR/Daily_Temporal_disaggregation_module.py $OBS_VAR_LIST $FCST_VAR_LIST $YEAR $iMonNo $VAR_TYPE $UNITS $lat1 $lat2 $lon1 $lon2 $fcstdatatype $ens_num $lead_months $FCST_SYR $FCST_EYR $MASK_FILE1 $MASK_FILE2 $INDIR2 $DAILY_RAW_FCST_DIR $OUTDIR2 > $LOGDIR/Daily_Tmpds_${YEAR}_${OBS_VAR_LIST}.log; 
+
+  echo "Doing subdaily temporal downscaling"; 
+  python $SRCDIR/Sub_Daily_Temporal_disaggregation_module.py $OBS_VAR_LIST $YEAR $iMonNo $VAR_TYPE $UNITS $lat1 $lat2 $lon1 $lon2 $fcstdatatype $ens_num $lead_months $FCST_SYR $FCST_EYR $INDIR21 $INDIR2 $OUTDIR2 $MASK_FILE1 $MASK_FILE3 > $LOGDIR/SubDaily_Tmpds_${YEAR}_${OBS_VAR_LIST}.log; 
+done
+
+echo " -- Temporal Disaggregation Complete -- "
+
+
+

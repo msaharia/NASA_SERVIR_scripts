@@ -1,0 +1,28 @@
+#! /bin/bash
+
+FCST_YEAR_1=$1
+FCST_YEAR_2=$2
+INIT_FCST_MON=$3
+
+OBS_VAR_LIST=(PRECCON PRECTOT LWGAB SWGDN PS QV2M T2M U10M V10M)
+FCST_VAR_LIST=(CNPRCP PRECTOT LWS SLRSF PS Q2M T2M U10M V10M)
+UNITS=('kg/m^2/s' 'kg/m^2/s' 'W/m^2' 'W/m^2' 'Pa' 'kg/kg' 'K' 'm/s' 'm/s')
+SCRIPT='/discover/nobackup/ahazra/shrad_test/codes/run_Temporal_disagg.scr'
+
+lat1=5 
+lat2=19 
+lon1=30 
+lon2=41
+
+
+for VAR_NUM in 0 ;#1 2 3 4 5 6 7 8; 
+do 
+
+if [ $VAR_NUM == 0 ] || [ $VAR_NUM == 1 ] || [ $VAR_NUM == 3 ]
+then
+	VAR_TYPE='PRCP'
+else
+	VAR_TYPE='TEMP'
+fi
+	sbatch $SCRIPT ${OBS_VAR_LIST[$VAR_NUM]} ${FCST_VAR_LIST[$VAR_NUM]} $FCST_YEAR_1 $FCST_YEAR_2 $INIT_FCST_MON $VAR_TYPE ${UNITS[$VAR_NUM]} 
+done;

@@ -1,0 +1,87 @@
+#!/bin/sh
+#SBATCH --job-name=BCSD_calc
+#
+## Jobs are submitted via the QoS now:
+##SBATCH --time=00:55:00
+##SBATCH --ntasks=1 --constraint=hasw
+#SBATCH --ntasks=1 
+#SBATCH --qos=long
+#SBATCH --time=00:55:00
+#
+## Enter NCCS Project ID below:
+#SBATCH --account=s1777
+#
+## Enter user email below:
+#SBATCH --mail-user=hahnchul.jung@nasa.gov
+#SBATCH --mail-type=END
+#SBATCH --output=PART2_BCSD_calc-%j.out
+#SBATCH --error=PART2_BCSD_calc-%j.err
+
+## Pass in required arguments:
+
+SRCDIR=${1}
+OBS_VAR_LIST=${2}
+FCST_VAR_LIST=${3}
+iMonNo=${4}
+VAR_TYPE=${5}
+UNIT=${6}
+lat1=${7} 
+lat2=${8}
+lon1=${9}
+lon2=${10}
+ens_numc=${11}
+ens_numf=${12}
+fcstdatatype=${13}
+lead_months=${14} 
+FCST_SYR=${15} 
+FCST_EYR=${16} 
+CLIM_SYR=${17} 
+CLIM_EYR=${18} 
+CHIRPS_MASK2=${19} 
+CHIRPS_MASK3=${20} 
+CLIM_INDIR=${21} 
+FCSTRAW_INDIR=${22} 
+OUTDIR3=${23}
+LOGDIR=${24}
+
+echo $SRCDIR
+echo $OBS_VAR_LIST
+echo $FCST_VAR_LIST
+echo $iMonNo
+echo $VAR_TYPE
+echo $UNIT
+echo $lat1
+echo $lat2
+echo $lon1
+echo $lon2
+echo $ens_num
+echo $lead_months
+echo $FCST_SYR
+echo $FCST_EYR
+echo $CLIM_SYR
+echo $CLIM_EYR
+echo $CHIRPS_MASK2
+echo $CHIRPS_MASK3
+echo $CLIM_INDIR
+echo $OUTDIR3
+echo $LOGDIR
+
+## Switch to local working directory and request unlimited stacksize memory:
+
+cd $SRCDIR
+ulimit -s unlimited
+
+source /usr/share/modules/init/sh
+module load other/comp/gcc-5.3-sp3
+module load other/SSSO_Ana-PyD/SApd_4.2.0_py2.7_gcc-5.3-sp3
+module load other/cdo-1.7.1
+
+
+echo " Calculating BCSD Step for Variable :: "${VAR_TYPE} 
+
+python ${SRCDIR}/Bias_correction_module1.py ${OBS_VAR_LIST} ${FCST_VAR_LIST} ${VAR_TYPE} ${UNIT} ${lat1} ${lat2} ${lon1} ${lon2} ${iMonNo} ${fcstdatatype} ${lead_months} ${ens_numc} ${ens_numf} ${FCST_SYR} ${FCST_EYR} ${CLIM_SYR} ${CLIM_EYR} ${CLIM_INDIR} ${FCSTRAW_INDIR} ${CHIRPS_MASK2} ${CHIRPS_MASK3} ${OUTDIR3} > ${LOGDIR}/Calc_BCSD_${OBS_VAR_LIST}.log
+
+echo " -- BCSD Coarse grid calculation Complete -- "
+
+
+

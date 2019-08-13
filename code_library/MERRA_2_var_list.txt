@@ -1,0 +1,14 @@
+SWGDN,QV2M,U10M,V10M,T2M,LWGAB,PRECCON,PS,PRECTOT
+
+QV2M tyx 2-meter specific humidity kg kg-1 d5124_m2_jan79.tavg1_2d_slv_Nx.monthly.198101.nc4
+U10M tyx 10-meter eastward wind m s-1 d5124_m2_jan79.tavg1_2d_slv_Nx.monthly.198101.nc4
+V10M tyx 10-meter northward wind m s-1 d5124_m2_jan79.tavg1_2d_slv_Nx.monthly.198101.nc4
+T2M tyx 2-meter air temperature K d5124_m2_jan79.tavg1_2d_slv_Nx.monthly.198101.nc4
+PS tyx surface pressure Pa d5124_m2_jan79.tavg1_2d_slv_Nx.monthly.198101.nc4 
+
+
+SWGDN tyx surface incoming shortwave flux W m-2 d5124_m2_jan79.tavg1_2d_rad_Nx.monthly.198101.nc4
+LWGAB tyx surface absorbed longwave radiation W m-2 d5124_m2_jan79.tavg1_2d_rad_Nx.monthly.198101.nc4
+
+PRECCON tyx convective precipitation kg m-2 s-1 d5124_m2_jan79.tavg1_2d_flx_Nx.monthly.198101.nc4
+PRECTOT tyx total precipitation from atm model physics kg m-2 s-1 d5124_m2_jan79.tavg1_2d_flx_Nx.monthly.198101.nc4

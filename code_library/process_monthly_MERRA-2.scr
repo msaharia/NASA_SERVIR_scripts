@@ -1,0 +1,81 @@
+#!/bin/bash
+## This script grabs needed forcing variables from MERRA-2 monthly files
+##   and saves them into one file.
+##
+
+SYR="${1}"
+EYR="${2}"
+
+# Meteorological forcing main directory:
+FORCEDIR="${3}" 
+
+# MAKE SURE PATHS ARE RESET TO YOUR LOCAL DIRECTORY:
+SRCDIR="${4}"
+OUTDIR="${5}"
+#mkdir -p $OUTDIR;
+
+M2OUTDIR1=${OUTDIR}'/MERRA2'
+M2OUTDIR2=${OUTDIR}'/MERRA2/Monthly'
+mkdir -p ${M2OUTDIR1}
+mkdir -p ${M2OUTDIR2}
+
+# Prepare MERRA-2 directory filenames:
+#if [ $SYR -ge 1979 ] && [ $EYR -le 1991 ]; then
+#  DIR=100
+#  INIT_YR=79
+#elif [ $SYR -ge 1992 ] && [ $EYR -le 2000 ]; then
+#  DIR=200
+#  INIT_YR=91
+#elif [ $SYR -ge 2001 ] && [ $EYR -le 2010 ]; then
+#  DIR=300
+#  INIT_YR=00
+#else
+#  DIR=400
+#  INIT_YR=10
+#fi
+#echo $DIR
+
+# Loop over each of the MERRA2
+for ((YEAR=$SYR; YEAR<=$EYR; YEAR++)); do
+
+   if [ $YEAR -ge 1979 ] && [ $YEAR -le 1991 ]; then
+    DIR=100
+    INIT_YR=79
+  elif [ $YEAR -ge 1992 ] && [ $YEAR -le 2000 ]; then
+    DIR=200
+    INIT_YR=91
+  elif [ $YEAR -ge 2001 ] && [ $YEAR -le 2010 ]; then
+    DIR=300
+    INIT_YR=00
+  else
+    DIR=400
+    INIT_YR=10
+  fi
+  echo $DIR
+
+  INDIR1=${FORCEDIR}"/MERRA2"
+
+  for mon in '01' '02' '03' '04' '05' '06' '07' '08' '09' '10' '11' '12'; do
+    echo "Processing MERRA-2 for year, mon :: "${YEAR}", "${mon}
+    INDIR2=${INDIR1}"/MERRA2_"${DIR}"/Y"${YEAR}"/M"${mon}
+    for PREFIX in 'slv' 'rad' 'flx'; do
+	INFILE="$INDIR2"/d5124_m2_jan"$INIT_YR".tavg1_2d_"$PREFIX"_Nx.monthly."$YEAR""$mon".nc4
+	echo $INFILE
+	if [ $PREFIX == "slv" ]; then
+           cdo selvar,QV2M,U10M,V10M,T2M,PS $INFILE $M2OUTDIR2/"$PREFIX"_monthly_"$YEAR""$mon".nc4
+	elif [ $PREFIX == "rad" ]; then
+           cdo selvar,SWGDN,LWGAB $INFILE $M2OUTDIR2/"$PREFIX"_monthly_"$YEAR""$mon".nc4
+	else
+           cdo selvar,PRECCON,PRECTOT $INFILE $M2OUTDIR2/"$PREFIX"_monthly_"$YEAR""$mon".nc4
+        fi
+    done;	
+#   Now merge all files
+    cdo merge $M2OUTDIR2/*_monthly_"$YEAR""$mon".nc4 $M2OUTDIR2/all_forc_var_"$YEAR""$mon".nc4
+##  Remove temporary files
+    rm -rf $M2OUTDIR2/*_monthly_"$YEAR""$mon".nc4
+  done;
+done
+
+ echo " -- Completed downloading and processing MERRA2 monthly files -- "
+
+

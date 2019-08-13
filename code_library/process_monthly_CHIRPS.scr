@@ -1,0 +1,37 @@
+#!/bin/bash
+## This script grabs needed forcing variables from CHIRPS monthly files:
+
+SYR="${1}"
+EYR="${2}"
+
+# Main Forcing directory on FAME disk:
+FORCEDIR="${3}"
+
+# MAKE SURE PATHS ARE RESET TO YOUR LOCAL DIRECTORY:
+SRCDIR="${4}"
+OUTDIR="${5}"
+mkdir -p $OUTDIR
+
+CH2MONDIR1=${OUTDIR}'/CHIRPSv2/'
+mkdir -p $CH2MONDIR1
+CH2MONDIR2=${OUTDIR}'/CHIRPSv2/Monthly'
+mkdir -p $CH2MONDIR2
+
+# Loop over and process each year of monthly files:
+for ((YEAR=$SYR; YEAR<=$EYR; YEAR++));  do
+## First convert Daily precipitation to monthly precipitation
+ DAILY_INFILE="$FORCEDIR"/CHIRPSv2/daily_p25/chirps-v2.0."$YEAR".days_p25.nc
+ MON_OUTFILE="$CH2MONDIR2"/chirps-v2.0."$YEAR".mon_p25.nc
+ cdo monmean $DAILY_INFILE $MON_OUTFILE
+
+ for mon in 01 02 03 04 05 06 07 08 09 10 11 12; do
+   echo "Processing CHIRPS for year, mon :: "${YEAR}", "${mon}
+   TEMP_FILE="$CH2MONDIR1"/junk.chirps-v2.0."$YEAR""$mon"_p25.nc
+   OUT_MON_FILE="$CH2MONDIR2"/chirps-v2.0."$YEAR""$mon"_p25.nc
+   cdo divc,86400 -selmon,"$mon" $MON_OUTFILE $TEMP_FILE
+   cdo chunit,'mm/day','kg/m2/s' $TEMP_FILE $OUT_MON_FILE
+   rm -rf $TEMP_FILE 
+ done;
+ rm -rf $MON_OUTFILE
+done;	
+

@@ -1,0 +1,24 @@
+-- Calling Combine_Sub_Daily_downscaled_forcings.py ... 
+________________________________________________________________
+Job Resource Usage Summary for 33869765 
+Note: SLURM doesn't account for the exact same resource types as PBS.  
+      Also, you may see some values missing or zero, typically for 
+      very short jobs.  However, please do contact NCCS USG if you 
+      think the values below are in error.
+
+  CPU Time Used		: 05:00:32
+  Memory Used		: 2254068K
+  Virtual Memory Used	: 2768536K
+  Walltime Used		: 00:10:44
+
+  Memory Requested	: 0n (n=per node; c=per core)
+  CPUs Requested / Allocated : 1 / 28
+  Walltime Requested	: 11:55:00
+
+  Execution Queue	: compute
+  Head Node		: borgn199
+  Charged to		: s1777
+
+  Job Stopped		: Mon Aug  5 10:54:07 EDT 2019
+_____________________________________________________________________
+

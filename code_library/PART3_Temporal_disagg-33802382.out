@@ -1,0 +1,48 @@
+/discover/nobackup/projects/servirwa/hahn/MODEL_RUNS/BCSD_Scripts_GEOS5V2_wa/code_library
+T2M
+T2M
+3
+TEMP
+K
+0
+30
+-20
+30
+10
+6
+2017
+2017
+/discover/nobackup/projects/servirwa/hahn/MODEL_RUNS/BCSD_Scripts_GEOS5V2_wa/code_library/CHIRPS_0.25_MASK.nc
+/discover/nobackup/projects/servirwa/hahn/MODEL_RUNS/BCSD_Scripts_GEOS5V2_wa/code_library/CHIRPS_MASK.nc
+/discover/nobackup/projects/servirwa/hahn/MODEL_RUNS/BCSD_Scripts_GEOS5V2_wa/SERVIRWA_Mar_data//
+/discover/nobackup/projects/fame/FORECASTS/GEOS5//RAW_GEOS5.V2
+/discover/nobackup/projects/servirwa/hahn/MODEL_RUNS/BCSD_Scripts_GEOS5V2_wa/SERVIRWA_Mar_data//GEOS5v2/BCSD_DATA
+/discover/nobackup/sshukla2/Misc
+/discover/nobackup/projects/servirwa/hahn/MODEL_RUNS/BCSD_Scripts_GEOS5V2_wa/code_library/Mask_merra2.nc
+/discover/nobackup/projects/servirwa/hahn/MODEL_RUNS/BCSD_Scripts_GEOS5V2_wa/code_library/Log_Files/
+Doing daily temporal downscaling
+Doing subdaily temporal downscaling
+ -- Temporal Disaggregation Complete -- 
+________________________________________________________________
+Job Resource Usage Summary for 33802382 
+Note: SLURM doesn't account for the exact same resource types as PBS.  
+      Also, you may see some values missing or zero, typically for 
+      very short jobs.  However, please do contact NCCS USG if you 
+      think the values below are in error.
+
+  CPU Time Used		: 04:42:48
+  Memory Used		: 3364204K
+  Virtual Memory Used	: 3920940K
+  Walltime Used		: 00:10:06
+
+  Memory Requested	: 0n (n=per node; c=per core)
+  CPUs Requested / Allocated : 1 / 28
+  Walltime Requested	: 23:55:00
+
+  Execution Queue	: compute
+  Head Node		: borgm192
+  Charged to		: s1777
+
+  Job Stopped		: Fri Aug  2 18:14:08 EDT 2019
+_____________________________________________________________________
+

@@ -1,0 +1,39 @@
+#!/bin/bash
+#SBATCH --job-name=GEOS5Daily
+#
+## Jobs are submitted via the QoS now:
+#SBATCH --time=11:00:00
+#
+## Enter NCCS Project ID below:
+#SBATCH --account=s1777
+#
+## Enter user email below:
+#SBATCH --mail-user=hahnchul.jung@nasa.gov
+##SBATCH --mail-type=END
+#SBATCH --output=PART1_GEOS5_Daily_process-%j.out
+#SBATCH --error=PART1_GEOS5_Daily_process-%j.err
+
+# Passing in user-specified arguments:
+SYR=${1}
+EYR=${2}
+iMon=${3}
+SRCDIR=${4}
+OUTDIR=${5}
+FORCEDIR=${6}
+GRID_DESCRIPTION1=${7}
+GRID_DESCRIPTION2=${8}
+ic1="${9}"
+ic2="${10}"
+ic3="${11}"
+ic4="${12}"
+
+source /usr/share/modules/init/bash
+module load other/cdo-1.7.1
+
+cd $SRCDIR
+ulimit -s unlimited
+
+sh $SRCDIR/process_daily_forecasts1.scr $SYR $EYR $iMon $SRCDIR $OUTDIR $FORCEDIR $GRID_DESCRIPTION1 $GRID_DESCRIPTION2 $ic1 $ic2 $ic3 $ic4
+
+echo " -- Done downloading daily GEOS5 files -- "
+
