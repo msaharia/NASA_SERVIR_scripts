@@ -20,34 +20,6 @@ lon2=30   #60
 lead_months=6
 ens_num=7 #10
 
-SRCDIR='/discover/nobackup/projects/servirwa/msaharia/autoservir/NASA_SERVIR_scripts/code_library' #Path to code_library
-
-iagnostic log file directory:
-LOGDIR=${SRCDIR}'/Log_Files/'
-mkdir -p ${LOGDIR}
-
-#Path for where files are GEOS5, CHIRPS, etc. files are located:
-FORCEDIR1='/discover/nobackup/projects/fame/FORECASTS/GEOS5/'     #PATH to RAW GEOS5 DATA
-FORCEDIR='/discover/nobackup/projects/servirwa/msaharia/autoservir/BCSD_Scripts_GEOS5V2_wa/SERVIRWA_Jun_data/'      #PATH to MONTHLY BCSD DATA and Temp. Disagg. OUTPUT
-
-
-DAILY_RAW_FCST_DIR=${FORCEDIR1}'/RAW_GEOS5.V2'
-
-# MERRA2 and CHIRPS masks
- INDIR2='/discover/nobackup/projects/fame/FORECASTS/GEOS5/BCSD_Test/'${iMon}''
-INDIR2=${FORCEDIR}'/'
-#INDIR21='/discover/nobackup/sshukla2/Misc'
-INDIR21='/discover/nobackup/hjung1/public/Manab/MET_FORCING'
-
-CHIRPS_MASK1=${SRCDIR}'/CHIRPS_0.25_MASK.nc'
-CHIRPS_MASK2=${SRCDIR}'/CHIRPS_MASK.nc'
-MERRA2_MASK1=${SRCDIR}'/Mask_merra2.nc'
-
-OUTDIR2=${FORCEDIR}'/'${fcstdatatype}'/BCSD_DATA'
-mkdir -p ${OUTDIR2}
-
-cd $SRCDIR
-
 #======================================================
 # USER PROMPT
 #======================================================
@@ -107,6 +79,33 @@ cal_ic_dates() {
 
 cal_ic_dates $icmon
 
+SRCDIR='/discover/nobackup/projects/servirwa/msaharia/autoservir/NASA_SERVIR_scripts/code_library' #Path to code_library
+
+#Diagnostic log file directory:
+LOGDIR=${SRCDIR}'/Log_Files/'
+mkdir -p ${LOGDIR}
+
+#Path for where files are GEOS5, CHIRPS, etc. files are located:
+FORCEDIR1='/discover/nobackup/projects/fame/FORECASTS/GEOS5/'     #PATH to RAW GEOS5 DATA
+FORCEDIR='/discover/nobackup/projects/servirwa/msaharia/autoservir/BCSD_Scripts_GEOS5V2_wa/${climdir}'      #PATH to MONTHLY BCSD DATA and Temp. Disagg. OUTPUT
+
+
+DAILY_RAW_FCST_DIR=${FORCEDIR1}'/RAW_GEOS5.V2'
+
+# MERRA2 and CHIRPS masks
+ INDIR2='/discover/nobackup/projects/fame/FORECASTS/GEOS5/BCSD_Test/'${iMon}''
+INDIR2=${FORCEDIR}'/'
+#INDIR21='/discover/nobackup/sshukla2/Misc'
+INDIR21='/discover/nobackup/hjung1/public/Manab/MET_FORCING'
+
+CHIRPS_MASK1=${SRCDIR}'/CHIRPS_0.25_MASK.nc'
+CHIRPS_MASK2=${SRCDIR}'/CHIRPS_MASK.nc'
+MERRA2_MASK1=${SRCDIR}'/Mask_merra2.nc'
+
+OUTDIR2=${FORCEDIR}'/'${fcstdatatype}'/BCSD_DATA'
+mkdir -p ${OUTDIR2}
+
+cd $SRCDIR
 
 #------------------------------------------------------------------------------
 #  Temporally downscale the monthly bias-corrected forecasts to daily 
