@@ -2,34 +2,71 @@
 
 This manual will outline the steps need to be performed to do the monthly run.
 
+The directory structure is for NASA server: `10.5.5.37`
+
 ## Download data
  
 ### 1.1 Download CHIRPS data
 
-* Open this script: get_CHIRPS_monthly.sh
-* Change `chirpsdir` to your directory where you would like to store the data
-* Open the terminal and run this script: `./get_CHIRPS_monthly.sh`
+* Enter this directory: `/home/Socrates/hjung/WA_025/MET_FORCING/`
+* Open this script: `get_CHIRPS_monthly.sh` 
+* Change `chirpsdir` to your directory where you would like to download the data
+* Run this script in the terminal: `./get_CHIRPS_monthly.sh`
 * This will prompt you for 2 things:
     * Year. Enter 2019, for example
     * Month. Enter 4, for example
+    * Enter `y` for confirmation. 
 * Download will commence
-
 
 ### 1.2 Download MERRA2 data
 
-* Open this script: Get_merra2_ges_disc_ALLVARS.sh
+* Enter this directory: `/home/Socrates/hjung/WA_025/MET_FORCING/`
+* Open this script: `Get_merra2_ges_disc_ALLVARS.sh`
 * Change `WORKDIR` to your directory where you would like to store the data
-* Open the terminal and run this script: `./Get_merra2_ges_disc_ALLVARS.sh`
-* This will prompt you for 2 things:
+* Run this script in the terminal: `./Get_merra2_ges_disc_ALLVARS.sh`
+* This will prompt you for 3 things:
     * Year. Enter 2019, for example
     * Month. Enter 4, for example
+    * Enter `y` for confirmation. 
 * Download will commence for 4 MERRA2 variables
+
+## GEOS 5 download
+
+* Enter this directory: `/home/Socrates/hjung/WA_025/MODEL_RUN/BCSD_Scripts/`
+
+### 2.1 GEOS5 download
+
+* Activate the python environment: `conda activate py2`
+* Run this script: `./Download_GEOS5V2_all.F.sh`
+* This will prompt you for 3 things:
+    * Forecast Year. Enter 2019, for example
+    * Forecast Month. Enter 4, for example
+    * Enter `y` for confirmation. 
+
+### 2.2 GEOS5 Bias correction
+* Run this script: `./TmpDisagg.F.sh`
+* This will prompt you for 3 things:
+    * Year. Enter 2019, for example
+    * Month. Enter 4, for example
+    * Enter `y` for confirmation. 
+* Download of bias-corrected daily and sub-daily forecasts will commence.
+ 
+### 2.3 Merging 
+* Run `combine.F.sh`
+* This will prompt you for 3 things:
+    * Forecast Year. Enter 2019, for example
+    * Forecast initialization Month. Enter 4, for example
+    * Enter `y` for confirmation. 
+* Will combine all non-precip 6-hourly files into one file.
 
 ## Retrospective run
 
+* `/home/Socrates/hjung/WA_025/MODEL_RUN/LDT_Files/ESPconv_RSTFILES/t2_upscale_01to07_grace_da.sh
+
 ### 2.1 LIS retro run
 * Go to `/home/Socrates/hjung/WA_025/MODEL_RUN/OL_CLSM`
-* Run LIS `./LIS -f /home/Socrates/hjung/WA_025/MODEL_RUN/OL_CLSM/lis.config`
+* Use mpirun with 32 processors. 
+* Run LIS `mpirun -np 32 ./LIS -f /home/Socrates/hjung/WA_025/MODEL_RUN/OL_CLSM/lis.config`
 
 ### 2.2 Prepare LIS outputs for Tethys Viewer
 
@@ -37,29 +74,3 @@ The Land Surface Model and Routing model output files from Step 2.1 have to be m
 
 * Go to `netcdf_conversion`
 * This will convert the data from start time (2019 5 20) to end time (2019 5 22): `./convertlisnetcdf 2019 5 20 2019 5 22 ./retrospective_directory /home/Socrates/hjung/tethyswa_lis_viewer/retrospective/ ./servirwa_nc_clsmf25_output.tbl.list.cf` 
-
-## Forecast Run
-
-3.1 GEOS5 download
-
-* 7 ensemble members
-* Only Forecast, no hindcast, p1-p4
-* /discover/nobackup/projects/servirwa/msaharia/autoservir/BCSD_Scripts_GEOS5V2_wa/download
-    * Remove ic[0], [1], [2]. Use ic[3] and 7 members
-    * PART1
-    * Automate 6 months of data download based on YEAR and MONTH
-    * FORCEDIR untar the data, geosgcm_vis2d
-    * p2 -> 
-    * Use prompt year and month
-    * update the FORCEDIR 
-    * Remove SBATCH and run the script within P2. The PYTHON command needs to be inside P2
-        * do the same for P3 and P4
-    * Final output files from p2/p3/p4 goes
-    * Test with 2019, May 1
-    * Download for Apr 26
-
-3.2 GEOS5 Downscaling and Bias Correction
-
-3.3 Forecast run
-
-
